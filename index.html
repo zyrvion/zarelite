@@ -107,7 +107,8 @@ $("f").addEventListener("submit",function(ev){
   ev.preventDefault();var t=q.value.trim();if(!t||sb.disabled)return;
   q.value="";add("me",t);hist.push({c:"me",t:t});save();
   sb.disabled=true;var w=add("wait","ZARELITE réfléchit…");
-  call("zareliteRoute",{key:KEY,action:"route",prompt:t,tab:"conversation"}).then(function(d){
+  var fil=hist.slice(-12).map(function(h){return {role:h.c==="me"?"user":"assistant",content:h.t};});
+  call("zareliteRoute",{key:KEY,action:"route",prompt:t,messages:fil,tab:"conversation"}).then(function(d){
     w.remove();sb.disabled=false;
     if(d&&d.ok){var r=d.reponse||{};var x=String(r.text||r.reponse||"(réponse vide)");add("z",x);hist.push({c:"z",t:x});save();}
     else{add("err","Pas de réponse: "+((d&&d.error)||"inconnu"));}
