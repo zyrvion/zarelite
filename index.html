@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="fr"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0a0c10">
+<title>ZARELITE</title>
+<style>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;min-width:0}
+html,body{width:100%;max-width:100vw;height:100%;margin:0;overflow:hidden;-webkit-text-size-adjust:100%}
+:root{--bg:#0a0c10;--p1:#10141b;--p2:#161c26;--br:#232c3a;--tx:#e8edf3;--mu:#8793a5;--ac:#2ec4a0;--ac2:#1d6b5a;--wa:#e8b04a;--er:#e5606a}
+body{background:var(--bg);color:var(--tx);font:16px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;display:flex;flex-direction:column;height:100dvh}
+header{flex:none;display:flex;align-items:center;gap:10px;padding:13px 16px;background:var(--p1);border-bottom:1px solid var(--br)}
+.logo{width:30px;height:30px;border-radius:9px;background:linear-gradient(135deg,var(--ac),#1a5fd0);display:grid;place-items:center;font-weight:800;font-size:15px;color:#04110d}
+h1{font-size:16px;margin:0;letter-spacing:.16em;font-weight:800}
+.st{margin-left:auto;display:flex;align-items:center;gap:7px;font-size:12px;color:var(--mu)}
+.dot{width:9px;height:9px;border-radius:50%;background:var(--mu)}
+.dot.ok{background:#2ecc71;box-shadow:0 0 9px #2ecc7199}
+.dot.ko{background:var(--er)}
+nav{flex:none;display:flex;background:var(--p1);border-bottom:1px solid var(--br);overflow-x:auto}
+nav button{flex:1 0 auto;background:none;border:0;color:var(--mu);font:inherit;font-size:14px;font-weight:600;padding:12px 16px;border-bottom:2px solid transparent;white-space:nowrap}
+nav button.on{color:var(--tx);border-bottom-color:var(--ac)}
+section{flex:1;min-height:0;display:none;flex-direction:column}
+section.on{display:flex}
+.scroll{flex:1;overflow-y:auto;overflow-x:hidden;padding:14px;display:flex;flex-direction:column;gap:10px}
+.msg{max-width:90%;padding:11px 14px;border-radius:16px;white-space:pre-wrap;overflow-wrap:anywhere}
+.me{align-self:flex-end;background:var(--ac2)}
+.z{align-self:flex-start;background:var(--p2);border:1px solid var(--br)}
+.wait{align-self:flex-start;color:var(--mu);font-size:14px}
+.err{align-self:flex-start;background:#3a1a1d;border:1px solid #5c2429;color:#ffd7d9;font-size:15px}
+form{flex:none;display:flex;gap:8px;padding:10px 10px calc(10px + env(safe-area-inset-bottom));background:var(--p1);border-top:1px solid var(--br)}
+input.t{flex:1 1 auto;width:0;height:50px;padding:0 14px;border-radius:14px;border:1px solid var(--br);background:var(--bg);color:var(--tx);font:inherit;font-size:17px;outline:none}
+form button{flex:none;width:56px;height:50px;border:0;border-radius:14px;background:var(--ac2);color:#fff;font-size:22px;font-weight:700}
+form button:disabled{opacity:.5}
+.cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.card{background:var(--p2);border:1px solid var(--br);border-radius:14px;padding:12px}
+.card b{display:block;font-size:22px;line-height:1.2}
+.card span{font-size:10px;color:var(--mu);text-transform:uppercase;letter-spacing:.08em}
+h2{font-size:12px;text-transform:uppercase;letter-spacing:.1em;color:var(--mu);margin:8px 0 0}
+.row{display:flex;gap:10px;align-items:center;background:var(--p2);border:1px solid var(--br);border-radius:12px;padding:11px 13px}
+.row .n{flex:1;font-size:14px;overflow-wrap:anywhere}
+.row .m{font-size:11px;color:var(--mu);text-align:right}
+.tag{font-size:11px;padding:3px 8px;border-radius:99px;background:#17392f;color:var(--ac)}
+.tag.off{background:#2a2f38;color:var(--mu)}
+.note{color:var(--mu);font-size:13px;padding:6px 2px}
+.btn{border:0;border-radius:12px;background:var(--ac2);color:#fff;font:inherit;font-weight:700;padding:12px 16px}
+pre{margin:0;background:var(--bg);border:1px solid var(--br);border-radius:12px;padding:12px;font-size:13px;overflow:auto;white-space:pre-wrap;overflow-wrap:anywhere}
+textarea{width:100%;min-height:150px;background:var(--bg);color:var(--tx);border:1px solid var(--br);border-radius:12px;padding:12px;font:13px/1.45 ui-monospace,Menlo,monospace;outline:none}
+select{background:var(--bg);color:var(--tx);border:1px solid var(--br);border-radius:10px;padding:10px;font:inherit}
+</style></head><body>
+<header><div class="logo">Z</div><h1>ZARELITE</h1><div class="st"><span class="dot" id="dot"></span><span id="stt">…</span></div></header>
+<nav id="nav">
+<button data-t="chat" class="on">Discussion</button>
+<button data-t="code">Code</button>
+<button data-t="disk">Disque</button>
+<button data-t="state">État</button>
+</nav>
+
+<section id="chat" class="on">
+<div class="scroll" id="log"></div>
+<form id="f" autocomplete="off"><input class="t" id="q" type="text" enterkeyhint="send" placeholder="Écris à ZARELITE" autocomplete="off"><button id="b" type="submit" aria-label="Envoyer">&#8593;</button></form>
+</section>
+
+<section id="code"><div class="scroll">
+<h2>Exécuter du vrai code</h2>
+<select id="lang"><option value="python">Python</option><option value="javascript">JavaScript</option><option value="typescript">TypeScript</option><option value="go">Go</option><option value="rust">Rust</option><option value="sql">SQL</option><option value="bash">Bash</option></select>
+<textarea id="src" spellcheck="false">print(sum(i*i for i in range(1, 6)))</textarea>
+<button class="btn" id="run">Exécuter</button>
+<pre id="out">Résultat ici.</pre>
+</div></section>
+
+<section id="disk"><div class="scroll">
+<div class="cards"><div class="card"><span>Fichiers</span><b id="cf">–</b></div><div class="card"><span>Missions</span><b id="cm">–</b></div><div class="card"><span>Cerveaux</span><b id="cb">–</b></div></div>
+<h2>Mon disque</h2><div id="files" class="note">Chargement…</div>
+<button class="btn" id="rf">Actualiser</button>
+</div></section>
+
+<section id="state"><div class="scroll">
+<h2>Cerveaux branchés</h2><div id="brains" class="note">Chargement…</div>
+<h2>Répartition</h2><pre id="rep">…</pre>
+</div></section>
+
+<script>
+(function(){
+var HOST="https://vesper-63d14659.base44.app/functions/", KEY="zarel-dispatch-artal-2026";
+function $(i){return document.getElementById(i);}
+function call(fn,body,ms){
+  var c=new AbortController();var t=setTimeout(function(){c.abort();},ms||60000);
+  return fetch(HOST+fn,{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify(body),signal:c.signal})
+    .then(function(r){return r.json();}).then(function(d){clearTimeout(t);return d;})
+    .catch(function(e){clearTimeout(t);return {ok:false,error:"réseau: "+(e&&e.message||e)};});
+}
+/* onglets */
+var tabs=document.querySelectorAll("nav button");
+tabs.forEach(function(b){b.addEventListener("click",function(){
+  tabs.forEach(function(x){x.classList.remove("on");});b.classList.add("on");
+  document.querySelectorAll("section").forEach(function(s){s.classList.remove("on");});
+  $(b.dataset.t).classList.add("on");
+  if(b.dataset.t==="disk")loadDisk(); if(b.dataset.t==="state")loadState();
+});});
+/* discussion */
+var log=$("log"),q=$("q"),sb=$("b"),HK="zarelite_hist_pages1",hist=[];
+try{hist=JSON.parse(localStorage.getItem(HK)||"[]");}catch(e){}
+function save(){try{localStorage.setItem(HK,JSON.stringify(hist.slice(-40)));}catch(e){}}
+function add(c,t){var d=document.createElement("div");d.className="msg "+c;d.textContent=t;log.appendChild(d);log.scrollTop=log.scrollHeight;return d;}
+if(hist.length){hist.forEach(function(h){add(h.c,h.t);});}else{add("z","ZARELITE est là. Pose ta question.");}
+$("f").addEventListener("submit",function(ev){
+  ev.preventDefault();var t=q.value.trim();if(!t||sb.disabled)return;
+  q.value="";add("me",t);hist.push({c:"me",t:t});save();
+  sb.disabled=true;var w=add("wait","ZARELITE réfléchit…");
+  call("zareliteRoute",{key:KEY,action:"route",prompt:t,tab:"conversation"}).then(function(d){
+    w.remove();sb.disabled=false;
+    if(d&&d.ok){var r=d.reponse||{};var x=String(r.text||r.reponse||"(réponse vide)");add("z",x);hist.push({c:"z",t:x});save();}
+    else{add("err","Pas de réponse: "+((d&&d.error)||"inconnu"));}
+    q.focus();
+  });
+});
+/* code */
+$("run").addEventListener("click",function(){
+  var o=$("out");o.textContent="Exécution…";$("run").disabled=true;
+  call("zarelHands",{key:KEY,action:"code",language:$("lang").value,source:$("src").value},45000).then(function(d){
+    $("run").disabled=false;
+    if(!d){o.textContent="Pas de réponse.";return;}
+    var s=(d.stdout||"")+(d.stderr?("\n[erreur]\n"+d.stderr):"")+(d.erreur_compilation?("\n[compilation]\n"+d.erreur_compilation):"");
+    o.textContent=(s.trim()||d.error||"(aucune sortie)")+"\n\n— "+(d.statut||"")+(d.temps_s?(" · "+d.temps_s+" s"):"");
+  });
+});
+/* disque */
+function loadDisk(){
+  call("zarelHands",{key:KEY,action:"list"}).then(function(d){
+    var fs=(d&&d.fichiers)||[];$("cf").textContent=(d&&d.total)||0;
+    $("files").innerHTML="";
+    if(!fs.length){$("files").textContent="Disque vide.";return;}
+    fs.forEach(function(f){var r=document.createElement("div");r.className="row";r.style.marginBottom="8px";
+      r.innerHTML='<span class="n"></span><span class="m"></span>';r.firstChild.textContent=f.path;
+      r.lastChild.textContent=(f.bytes>1024?(f.bytes/1024).toFixed(1)+" Ko":f.bytes+" o")+" · v"+(f.version||1);$("files").appendChild(r);});
+  });
+  call("zarelWork",{key:KEY,action:"list"}).then(function(d){$("cm").textContent=(d&&d.total)||0;});
+}
+$("rf").addEventListener("click",loadDisk);
+/* état */
+function loadState(){
+  call("zarelDispatch",{action:"plan"}).then(function(d){
+    if(!d||!d.cerveaux){$("brains").textContent="Indisponible.";return;}
+    $("cb").textContent=d.cerveaux;
+    var br=d.branches||[];$("brains").innerHTML="";
+    if(!br.length){$("brains").textContent="Aucun cerveau branché.";}
+    br.forEach(function(b){var r=document.createElement("div");r.className="row";r.style.marginBottom="8px";
+      r.innerHTML='<span class="n"></span><span class="tag">en ligne</span>';
+      r.firstChild.textContent=(b.brain||b.name||JSON.stringify(b))+(b.provider?(" · "+b.provider):"");$("brains").appendChild(r);});
+    $("rep").textContent=JSON.stringify(d.repartition||{},null,1);
+  });
+}
+/* statut */
+call("zarelDispatch",{action:"plan"},20000).then(function(d){
+  var ok=d&&d.cerveaux;$("dot").className="dot "+(ok?"ok":"ko");
+  var n=(d&&d.branches&&d.branches.length)||0;$("stt").textContent=ok?(n+" cerveau"+(n>1?"x":"")+" en ligne"):"hors ligne";
+  if(ok)$("cb").textContent=d.cerveaux;
+});
+})();
+</script></body></html>
