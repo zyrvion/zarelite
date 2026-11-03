@@ -106,11 +106,17 @@ select{background:var(--bg);color:var(--tx);border:1px solid var(--br);border-ra
 (function(){
 var HOST="https://vesper-63d14659.base44.app/functions/", KEY="zarel-dispatch-artal-2026";
 function $(i){return document.getElementById(i);}
-function call(fn,body,ms){
+function callOnce(fn,body,ms){
   var c=new AbortController();var t=setTimeout(function(){c.abort();},ms||60000);
-  return fetch(HOST+fn,{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify(body),signal:c.signal})
-    .then(function(r){return r.json();}).then(function(d){clearTimeout(t);return d;})
-    .catch(function(e){clearTimeout(t);return {ok:false,error:"réseau: "+(e&&e.message||e)};});
+  return fetch(HOST+fn,{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify(body),signal:c.signal},{cache:"no-store"})
+    .then(function(r){if(!r.ok)throw new Error("serveur "+r.status);return r.json();})
+    .then(function(d){clearTimeout(t);return d;})
+    .catch(function(e){clearTimeout(t);throw e;});
+}
+function call(fn,body,ms){
+  return callOnce(fn,body,ms)
+    .catch(function(){return new Promise(function(r){setTimeout(r,900);}).then(function(){return callOnce(fn,body,ms);});})
+    .catch(function(e){return {ok:false,error:"connexion impossible. Vérifie ton réseau puis réessaie. ("+(e&&e.message||e)+")"};});
 }
 /* onglets */
 var tabs=document.querySelectorAll("nav button");
