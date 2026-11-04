@@ -1,0 +1,88 @@
+<!doctype html><html lang="fr"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Portrait parlant — ZYRVION</title><style>
+*{box-sizing:border-box}body{margin:0;background:#080b14;color:#e8eefc;font-family:system-ui,sans-serif;padding:16px;max-width:620px;margin:auto}
+h1{font-size:19px;margin:0 0 4px}p.s{color:#7c8db5;font-size:13px;margin:0 0 16px}
+canvas{width:100%;border-radius:14px;background:#101828;display:block}
+textarea{width:100%;margin-top:14px;background:#111827;border:1px solid #24304d;color:#e8eefc;border-radius:10px;padding:11px;font-size:15px;font-family:inherit}
+button{width:100%;margin-top:12px;background:#2563eb;color:#fff;border:0;border-radius:12px;padding:14px;font-size:16px;font-weight:600}
+button.alt{background:#1f2937;border:1px solid #374151}
+button:disabled{opacity:.45}
+</style></head><body>
+<h1>Portrait parlant</h1><p class="s">Écris le texte, le personnage le prononce avec la voix française et la bouche qui suit les mots.</p>
+<canvas id="c" width="640" height="640"></canvas>
+<textarea id="txt" rows="3">Bonjour, je suis ZAREL. Bienvenue sur ZYRVION, la plateforme qui fait circuler vos colis partout au Burkina Faso.</textarea>
+<button id="parler">Faire parler</button>
+<button id="rec" class="alt">Enregistrer la vidéo</button>
+<div id="out" style="margin-top:12px;font-size:13px;color:#93a4c8"></div>
+<script>
+const c=document.getElementById('c'),x=c.getContext('2d'),out=document.getElementById('out');
+let bouche=0, cible=0, cligne=0, t=0, rec=null, chunks=[];
+const W=640,H=640;
+function dessine(){
+ x.clearRect(0,0,W,H);
+ // fond
+ const g=x.createLinearGradient(0,0,0,H); g.addColorStop(0,'#132038'); g.addColorStop(1,'#0b1120');
+ x.fillStyle=g; x.fillRect(0,0,W,H);
+ const cx=W/2, cy=H/2+20;
+ // cou
+ x.fillStyle='#c98d63'; x.fillRect(cx-42,cy+120,84,120);
+ // visage
+ x.fillStyle='#e0a978'; x.beginPath(); x.ellipse(cx,cy,140,165,0,0,Math.PI*2); x.fill();
+ // cheveux
+ x.fillStyle='#171b26'; x.beginPath(); x.ellipse(cx,cy-105,145,95,0,0,Math.PI*2); x.fill();
+ // oreilles
+ x.fillStyle='#d59f70'; x.beginPath(); x.ellipse(cx-138,cy+10,20,32,0,0,Math.PI*2); x.fill();
+ x.beginPath(); x.ellipse(cx+138,cy+10,20,32,0,0,Math.PI*2); x.fill();
+ // yeux
+ const oy=cy-30, blink=cligne>0?0.12:1;
+ [[-55,'l'],[55,'r']].forEach(([dx])=>{
+  x.fillStyle='#fff'; x.beginPath(); x.ellipse(cx+dx,oy,30,20*blink,0,0,Math.PI*2); x.fill();
+  if(blink===1){ x.fillStyle='#2b2118'; x.beginPath(); x.arc(cx+dx+Math.sin(t/60)*3,oy,11,0,Math.PI*2); x.fill();
+   x.fillStyle='#fff'; x.beginPath(); x.arc(cx+dx+Math.sin(t/60)*3-4,oy-4,4,0,Math.PI*2); x.fill(); }
+ });
+ // sourcils
+ x.strokeStyle='#171b26'; x.lineWidth=7; x.lineCap='round';
+ x.beginPath(); x.moveTo(cx-82,oy-38); x.quadraticCurveTo(cx-55,oy-50-bouche*8,cx-28,oy-38); x.stroke();
+ x.beginPath(); x.moveTo(cx+28,oy-38); x.quadraticCurveTo(cx+55,oy-50-bouche*8,cx+82,oy-38); x.stroke();
+ // nez
+ x.strokeStyle='#c98d63'; x.lineWidth=6;
+ x.beginPath(); x.moveTo(cx,oy+18); x.lineTo(cx-8,oy+58); x.lineTo(cx+8,oy+60); x.stroke();
+ // bouche
+ const oy2=cy+95, ouverture=8+bouche*46, largeur=54-bouche*6;
+ x.fillStyle='#6b2737';
+ x.beginPath(); x.ellipse(cx,oy2,largeur,ouverture,0,0,Math.PI*2); x.fill();
+ if(bouche>0.05){ x.fillStyle='#f5f5f5'; x.beginPath(); x.ellipse(cx,oy2-ouverture*0.45,largeur*0.85,ouverture*0.3,0,0,Math.PI*2); x.fill(); }
+ if(bouche<0.15){ x.strokeStyle='#8a3b4a'; x.lineWidth=3; x.beginPath(); x.moveTo(cx-largeur,oy2); x.quadraticCurveTo(cx,oy2+6,cx+largeur,oy2); x.stroke(); }
+ t++; cligne=cligne>0?cligne-1:(Math.random()<0.012?9:0);
+ bouche += (cible-bouche)*0.28;
+ requestAnimationFrame(dessine);
+}
+dessine();
+const API="https://zyrvion--zarel-chat-cerveau-parler.us-east.modal.run";
+document.getElementById('parler').onclick=async()=>{
+ const txt=document.getElementById('txt').value.trim(); if(!txt)return;
+ out.textContent='Le personnage parle…';
+ if(!('speechSynthesis' in window)){out.textContent='Voix indisponible sur ce navigateur.';return;}
+ speechSynthesis.cancel();
+ const u=new SpeechSynthesisUtterance(txt); u.lang='fr-FR'; u.rate=0.95;
+ let voix=speechSynthesis.getVoices().find(v=>v.lang&&v.lang.startsWith('fr'));
+ if(voix)u.voice=voix;
+ // la bouche s ouvre sur chaque syllabe prononcee
+ u.onboundary=(e)=>{ cible=0.55+Math.random()*0.45; setTimeout(()=>{cible=0.15+Math.random()*0.2;},110); };
+ u.onstart=()=>{cible=0.4;};
+ u.onend=()=>{cible=0;out.textContent='Terminé.';};
+ speechSynthesis.speak(u);
+};
+document.getElementById('rec').onclick=async()=>{
+ const st=c.captureStream(30);
+ const type=MediaRecorder.isTypeSupported('video/webm;codecs=vp9')?'video/webm;codecs=vp9':'video/webm';
+ chunks=[]; rec=new MediaRecorder(st,{mimeType:type});
+ rec.ondataavailable=e=>e.data.size&&chunks.push(e.data);
+ rec.onstop=()=>{const b=new Blob(chunks,{type:'video/webm'});
+  out.innerHTML='Vidéo prête ('+(b.size/1048576).toFixed(1)+' Mo) — <a style="color:#5eead4" href="'+URL.createObjectURL(b)+'" download="zyrvion-portrait.webm">télécharger</a>';};
+ rec.start();
+ document.getElementById('parler').click();
+ setTimeout(()=>{ if(rec&&rec.state==='recording')rec.stop(); }, 12000);
+};
+</script></body></html>
