@@ -1,0 +1,53 @@
+<!doctype html><html lang="fr"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Générateur vidéo — ZYRVION</title><style>
+*{box-sizing:border-box}body{margin:0;font-family:system-ui,sans-serif;background:#080b14;color:#e8eefc;padding:18px;max-width:640px;margin:auto}
+h1{font-size:20px;margin:0 0 4px}p.s{color:#7c8db5;font-size:13px;margin:0 0 18px}
+label{display:block;font-size:12px;color:#93a4c8;margin:14px 0 6px;text-transform:uppercase;letter-spacing:.6px}
+textarea,input{width:100%;background:#111827;border:1px solid #24304d;color:#e8eefc;border-radius:10px;padding:11px;font-size:15px;font-family:inherit}
+canvas{width:100%;border-radius:12px;margin-top:16px;background:#000}
+button{width:100%;margin-top:16px;background:#2563eb;color:#fff;border:0;border-radius:12px;padding:15px;font-size:16px;font-weight:600}
+button:disabled{opacity:.45}a{color:#5eead4}
+</style></head><body>
+<h1>Générateur vidéo</h1><p class="s">Décris ton film, chaque scène devient une image animée puis une vidéo MP4 téléchargeable. Gratuit, sans compte.</p>
+<label>Sujet</label><textarea id="sujet" rows="3">Un marché coloré de Ouagadougou au coucher du soleil, ambiance chaleureuse</textarea>
+<label>Scènes (2 à 6)</label><input id="nb" type="number" min="2" max="6" value="3">
+<label>Format</label><input id="fmt" value="9:16">
+<button id="go">Générer la vidéo</button>
+<canvas id="c" width="720" height="1280"></canvas>
+<div id="out" style="margin-top:14px;font-size:14px;color:#93a4c8"></div>
+<script>
+const c=document.getElementById('c'),x=c.getContext('2d'),go=document.getElementById('go'),out=document.getElementById('out');
+const fmt=()=>document.getElementById('fmt').value.trim()==='9:16'?[720,1280]:[1280,720];
+function img(url){return new Promise(res=>{const i=new Image();i.crossOrigin='anonymous';i.onload=()=>res(i);i.onerror=()=>res(null);i.src=url;});}
+function drawIm(i,p){const[w,h]=[c.width,c.height];x.fillStyle='#000';x.fillRect(0,0,w,h);
+if(!i)return;const s=1.08+0.12*p,iw=i.width*s,ih=i.height*s;
+x.drawImage(i,(w-iw)/2+(iw-w)*0.06*Math.sin(p*3.14),(h-ih)/2,(iw),(ih));}
+go.onclick=async()=>{
+ go.disabled=true;out.textContent='Préparation…';
+ const[w,h]=fmt();c.width=w;c.height=h;
+ const sujet=document.getElementById('sujet').value.trim();
+ const n=Math.max(2,Math.min(6,+document.getElementById('nb').value||3));
+ const scenes=[];
+ for(let k=0;k<n;k++){
+  const p=encodeURIComponent(sujet+', scène '+(k+1)+', photographie réaliste, lumière naturelle, haute qualité');
+  out.textContent=`Génération de la scène ${k+1}/${n}…`;
+  scenes.push(await img(`https://image.pollinations.ai/prompt/${p}?width=${w}&height=${h}&nologo=true&seed=${Date.now()+k}`));
+ }
+ const stream=c.captureStream(30);
+ const rec=new MediaRecorder(stream,{mimeType:MediaRecorder.isTypeSupported('video/webm;codecs=vp9')?'video/webm;codecs=vp9':'video/webm'});
+ const parts=[];rec.ondataavailable=e=>e.data.size&&parts.push(e.data);
+ const done=new Promise(r=>rec.onstop=r);
+ rec.start();
+ const duree=Math.min(4000,Math.max(2000,9000/n));
+ for(let k=0;k<scenes.length;k++){
+  const t0=performance.now();
+  while(performance.now()-t0<duree){drawIm(scenes[k],(performance.now()-t0)/duree);await new Promise(r=>requestAnimationFrame(r));}
+ }
+ rec.stop();await done;
+ const blob=new Blob(parts,{type:'video/webm'});
+ const url=URL.createObjectURL(blob);
+ out.innerHTML=`Vidéo prête (${(blob.size/1048576).toFixed(1)} Mo) — <a href="${url}" download="zyrvion-video.webm">télécharger</a>`;
+ go.disabled=false;
+};
+</script></body></html>
