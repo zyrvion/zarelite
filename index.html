@@ -60,7 +60,7 @@ textarea.code{width:100%;height:52vh;border:1px solid #e3e3e6;border-radius:13px
  <div class="view on" id="v-chat"><div id="msgs"><div class="hero"><h1>ZARELIT</h1>
  <p>Écris. Le cerveau se réveille, répond, se rendort.<br>Il choisit seul celui qui convient.</p>
  <div class="chips"><div class="chip" onclick="ex('Qui es-tu ?')">Qui es-tu ?</div><div class="chip" onclick="ex('Résume ZYRVION')">ZYRVION</div><div class="chip" onclick="ex('Écris un slogan pour ZYRVION')">Un slogan</div></div></div></div>
- <div id="box"><div id="in"><textarea id="t" rows="1" placeholder="Écris à ZARELITIT…"></textarea><button id="go">↑</button></div></div></div>
+ <div id="box"><div id="in"><textarea id="t" rows="1" placeholder="Écris à ZARELITITIT…"></textarea><button id="go">↑</button></div></div></div>
 
  <div class="view" id="v-cerveaux"><div class="pad" id="liste"></div></div>
 
@@ -85,6 +85,8 @@ const C={chat:"https://zyrvion--zarel-chat-cerveau-parler.us-east.modal.run",
  petit:"https://zyrvion--zarel-multi-petitcerveau-parler.us-east.modal.run",
  vec:"https://zyrvion--zarel-multi-memoire-vectoriser.us-east.modal.run",
  base:"https://zyrvion--zarel-multi-ui.us-east.modal.run"};
+
+const IDENTITE=`Tu es ZARELIT, assistant IA d'Arta Lyon (entreprise ZYRVION, Burkina Faso). Réponds en français, en 2 ou 3 phrases courtes. Quand on te parle de tes cerveaux, ce sont tes modèles IA, pas le cerveau humain. Tes modèles en ligne : qwen3-1.7b (discussion, c'est toi), smollm2-1.7b (secours), bge-m3 (mémoire), whisper-large-v3 (voix vers texte), deepseek-r1-1.5b (raisonnement), lfm3-1.7b (discussion), madlad400-3b (traduction), moondream2 (images). Les gros modèles (14B, 32B, Mixtral) ne sont pas encore branchés. Si tu ne sais pas, dis je ne sais pas.`;
 const $=i=>document.getElementById(i),side=$("side");
 let S=JSON.parse(localStorage.zarelCHAT||"[]"),cur=null;
 const save=()=>localStorage.zarelCHAT=JSON.stringify(S);
@@ -119,7 +121,7 @@ async function envoyer(){const t=$("t").value.trim();if(!t)return;if(cur===null)
  const c=S[cur];if(!c.t)c.t=t.slice(0,42);c.m.push({r:"user",c:t});bulle("user",t);
  $("t").value="";$("t").style.height="auto";$("go").disabled=true;$("tag").textContent="réveil…";
  const w=bulle("assistant","Le cerveau se réveille…"); 
- try{const msgs=c.m.map(x=>({role:x.r,content:x.c})).slice(-10);
+ try{const msgs=[{role:'system',content:IDENTITE}].concat(c.m.map(x=>({role:x.r,content:x.c})).slice(-8));
   const r=await fetch(C.chat,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({messages:msgs,max:500})});
   const j=await r.json();w.textContent=(j.reponse||"").trim()||"(vide)";
   const n=j.cerveau+" · "+j.hote;const s=document.createElement("small");s.textContent=n;w.appendChild(s);
