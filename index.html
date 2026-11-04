@@ -1,6 +1,6 @@
 <!doctype html><html lang="fr"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>ZAREL</title><style>
+<title>ZARELIT</title><style>
 *{box-sizing:border-box;margin:0;-webkit-tap-highlight-color:transparent}
 html,body{height:100%;overflow:hidden;font-family:-apple-system,system-ui,"Segoe UI",sans-serif;background:#fff;color:#111}
 #app{display:flex;height:100%}
@@ -44,7 +44,7 @@ textarea.code{width:100%;height:52vh;border:1px solid #e3e3e6;border-radius:13px
 </style></head><body>
 <div id="app">
 <aside id="side">
- <div class="brand">ZAREL</div>
+ <div class="brand">ZARELIT</div>
  <div class="new" onclick="neuf()">＋ Nouvelle discussion</div>
  <div class="nav on" data-v="chat" onclick="voir('chat',this)">💬 Discussion</div>
  <div class="nav" data-v="cerveaux" onclick="voir('cerveaux',this)">🧠 Cerveaux</div>
@@ -57,15 +57,15 @@ textarea.code{width:100%;height:52vh;border:1px solid #e3e3e6;border-radius:13px
 <main>
  <header><button id="menu" onclick="side.classList.toggle('open')">☰</button><span id="tag">en veille</span></header>
 
- <div class="view on" id="v-chat"><div id="msgs"><div class="hero"><h1>ZAREL</h1>
+ <div class="view on" id="v-chat"><div id="msgs"><div class="hero"><h1>ZARELIT</h1>
  <p>Écris. Le cerveau se réveille, répond, se rendort.<br>Il choisit seul celui qui convient.</p>
  <div class="chips"><div class="chip" onclick="ex('Qui es-tu ?')">Qui es-tu ?</div><div class="chip" onclick="ex('Résume ZYRVION')">ZYRVION</div><div class="chip" onclick="ex('Écris un slogan pour ZYRVION')">Un slogan</div></div></div></div>
- <div id="box"><div id="in"><textarea id="t" rows="1" placeholder="Écris à ZAREL…"></textarea><button id="go">↑</button></div></div></div>
+ <div id="box"><div id="in"><textarea id="t" rows="1" placeholder="Écris à ZARELITIT…"></textarea><button id="go">↑</button></div></div></div>
 
  <div class="view" id="v-cerveaux"><div class="pad" id="liste"></div></div>
 
  <div class="view" id="v-outils"><div class="pad">
-  <div class="card"><h3><span class="dot"></span>Mémoire sémantique</h3><p>bge-m3 transforme un texte en vecteur de 1024 nombres. C'est ainsi que ZAREL retrouve ce qu'il sait.</p>
+  <div class="card"><h3><span class="dot"></span>Mémoire sémantique</h3><p>bge-m3 transforme un texte en vecteur de 1024 nombres. C'est ainsi que ZARELIT retrouve ce qu'il sait.</p>
    <textarea id="txtm" rows="3" style="width:100%;margin-top:9px;border:1px solid #e3e3e6;border-radius:11px;padding:10px;font:inherit;font-size:14px" placeholder="Un texte à mémoriser…"></textarea>
    <button class="btnr" onclick="memoire()">Vectoriser</button><div id="rm" style="font-size:12px;color:#666;margin-top:8px"></div></div>
   <div class="card"><h3><span class="dot off"></span>Oreille</h3><p>whisper-large-v3 transforme une voix en texte. Prêt à brancher.</p></div>
@@ -73,7 +73,7 @@ textarea.code{width:100%;height:52vh;border:1px solid #e3e3e6;border-radius:13px
  </div></div>
 
  <div class="view" id="v-code"><div class="pad">
-  <div class="card"><h3><span class="dot"></span>Ton propre code</h3><p>ZAREL tient son interface lui-même. Modifie ce code et publie : la page change pour tout le monde, sans passer par moi.</p>
+  <div class="card"><h3><span class="dot"></span>Ton propre code</h3><p>ZARELIT tient son interface lui-même. Modifie ce code et publie : la page change pour tout le monde, sans passer par moi.</p>
    <button class="btnr" onclick="chargerCode()">Charger mon code</button>
    <textarea class="code" id="code" spellcheck="false" placeholder="Clique sur « Charger mon code »"></textarea>
    <button class="btnr" onclick="publier()">Publier ma nouvelle interface</button>
@@ -90,7 +90,7 @@ let S=JSON.parse(localStorage.zarelCHAT||"[]"),cur=null;
 const save=()=>localStorage.zarelCHAT=JSON.stringify(S);
 function hist(){$("hist").innerHTML="";S.forEach((c,i)=>{const d=document.createElement("div");d.className="it"+(i===cur?" on":"");d.textContent=c.t||"Discussion";d.onclick=()=>{cur=i;dessiner();voir("chat");side.classList.remove("open")};$("hist").appendChild(d)})}
 function dessiner(){const m=$("msgs");m.innerHTML="";const c=S[cur];
- if(!c||!c.m.length){m.innerHTML='<div class="hero"><h1>ZAREL</h1><p>Écris. Le cerveau se réveille, répond, se rendort.<br>Il choisit seul celui qui convient.</p></div>'}
+ if(!c||!c.m.length){m.innerHTML='<div class="hero"><h1>ZARELIT</h1><p>Écris. Le cerveau se réveille, répond, se rendort.<br>Il choisit seul celui qui convient.</p></div>'}
  else c.m.forEach(x=>bulle(x.r,x.c,x.n));hist();m.scrollTop=m.scrollHeight}
 function bulle(r,c,n){const m=$("msgs");if(m.querySelector(".hero"))m.innerHTML="";
  const d=document.createElement("div");d.className="msg "+(r==="user"?"u":"a");d.textContent=c;
