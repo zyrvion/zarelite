@@ -3,7 +3,7 @@
 <meta name="theme-color" content="#0b0b0f"><title>ZARELITE</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-html,body{height:100%;overflow:hidden;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:#fbfbfd;color:#0d0d12}
+html,body{height:100%;overflow:hidden;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:#f7f7fa;color:#111114}
 #app{display:flex;height:100%}
 aside{width:292px;background:#f4f4f7;border-right:1px solid #e8e8ee;display:flex;flex-direction:column;padding:16px 12px 10px;gap:4px;z-index:30;transition:transform .24s cubic-bezier(.4,0,.2,1)}
 .brand{display:flex;align-items:center;gap:10px;padding:2px 8px 18px}
@@ -37,11 +37,11 @@ header{display:flex;align-items:center;gap:10px;padding:12px 16px;border-bottom:
 .chips{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:24px}
 .chip{border:1px solid #e8e8ee;border-radius:12px;padding:11px 13px;font-size:12.5px;cursor:pointer;color:#4a4a58;text-align:left;font-weight:520}
 .chip:hover{background:#fafafc;border-color:#d8d8e2}
-.msg{max-width:780px;width:100%;margin:0 auto;font-size:15.5px;line-height:1.68;white-space:pre-wrap;word-break:break-word}
-.msg.u{background:#f4f4f7;padding:12px 16px;border-radius:18px;width:fit-content;max-width:86%;margin-left:auto;margin-right:0;margin-bottom:0}
-.meta{display:block;color:#b0b0bc;font-size:10.5px;margin-top:7px;font-weight:500}
+.msg{max-width:760px;width:100%;margin:0 auto;font-size:15.5px;line-height:1.72;letter-spacing:.1px;white-space:pre-wrap;word-break:break-word}
+.msg.u{background:#141418;color:#fff;padding:12px 17px;border-radius:20px 20px 6px 20px;width:fit-content;max-width:86%;margin-left:auto;margin-right:0;margin-bottom:0}
+.meta{display:none}
 #composer{padding:10px 14px 16px;max-width:820px;width:100%;margin:0 auto}
-#inbox{display:flex;align-items:flex-end;gap:8px;border:1px solid #e2e2ea;border-radius:26px;padding:9px 9px 9px 16px;background:#fff;box-shadow:0 4px 20px rgba(0,0,0,.055);transition:border-color .15s}
+#inbox{display:flex;align-items:flex-end;gap:8px;border:1px solid #e6e6ee;border-radius:26px;padding:9px 9px 9px 17px;background:#fff;box-shadow:0 6px 26px rgba(20,20,40,.07);transition:border-color .15s}
 #inbox:focus-within{border-color:#c9c9d6}
 #t{flex:1;border:0;outline:0;resize:none;font:inherit;font-size:16px;max-height:140px;padding:7px 0;background:none;line-height:1.45}
 #go{width:40px;height:40px;border-radius:50%;border:0;background:#0d0d12;color:#fff;font-size:16px;cursor:pointer;flex:none;display:flex;align-items:center;justify-content:center}
@@ -138,7 +138,8 @@ textarea.code{width:100%;height:50vh;border:1px solid #e2e2ea;border-radius:13px
   <div class="card"><h3><span class="dot"></span>Mon propre code</h3><p>ZARELITE tient son interface lui-même. Modifie ce code et publie : la page change pour tout le monde, sans passer par Vesper.</p>
    <button class="btn" onclick="chargerCode()">Charger mon code</button>
    <textarea class="code" id="code" spellcheck="false" placeholder="Clique sur Charger mon code"></textarea>
-   <button class="btn dark" onclick="publier()">Publier ma nouvelle interface</button><div class="out" id="rcode"></div></div>
+   <button class="btn dark" onclick="publier()">Publier ma nouvelle interface</button>
+   <button class="btn" onclick="reparer()">✦ Me réparer moi-même</button><div class="out" id="rcode"></div></div>
  </div></div>
 </main></div>
 <script>
@@ -165,7 +166,7 @@ function dessiner(){const m=$("msgs");m.innerHTML="";const c=S[cur];
  else c.m.forEach(x=>bulle(x.r,x.c,x.n));hist();m.scrollTop=m.scrollHeight}
 function bulle(r,c,n){const m=$("msgs");if(m.querySelector(".hero"))m.innerHTML="";
  const d=document.createElement("div");d.className="msg "+(r==="user"?"u":"a");d.textContent=c;
- if(n){const s=document.createElement("span");s.className="meta";s.textContent=n;d.appendChild(s)}
+ 
  m.appendChild(d);m.scrollTop=m.scrollHeight;return d}
 function neuf(){S.unshift({t:"",m:[]});cur=0;save();dessiner();voir("chat");side.classList.remove("open")}
 function ex(t){$("t").value=t;envoyer()}
@@ -205,8 +206,7 @@ async function envoyer(){const t=$("t").value.trim();if(!t)return;if(cur===null)
  try{const msgs=[{role:"system",content:IDENTITE}].concat(c.m.map(x=>({role:x.r,content:x.c})).slice(-8));
   const r=await fetch(url,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({messages:msgs,max:500})});
   const j=await r.json();const rep=(j.reponse||"").trim()||"(réponse vide)";
-  w.textContent=rep;const n=(j.cerveau||"?")+" · "+(j.hote||"modal");const s=document.createElement("span");
-  s.className="meta";s.textContent=n;w.appendChild(s);c.m.push({r:"assistant",c:rep,n});
+  w.textContent=rep;c.m.push({r:"assistant",c:rep});
   $("stxt").textContent="éveillé";
  }catch(e){w.textContent="Pas de réponse. Réessaie dans un instant.";$("stxt").textContent="en veille"}
  save();hist();$("go").disabled=false}
@@ -252,6 +252,23 @@ async function traduire(){const t=$("ttrad").value.trim();if(!t)return;const o=$
  try{const r=await fetch(E.trad,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({texte:t,vers:$("vtrad").value})});
   const j=await r.json();o.textContent=j.texte+"\n\n— "+j.cerveau+" (qualité non garantie)";
  }catch(e){o.textContent="Le cerveau se réveille, réessaie."}}
+
+async function reparer(){
+ const o=$("rcode");o.classList.add("on");o.textContent="ZARELITE analyse son propre code…";
+ try{
+  const cur=await (await fetch(E.base+"/code")).json();
+  const page=cur.code||"";
+  const demande="Tu es ZARELITE. Voici le code HTML complet de ton interface. Améliore-la : design plus moderne et professionnel, plus fluide sur téléphone, aucune signature technique sous les messages, garde TOUTES les fonctions existantes (identifiants des vues, fonctions JS, adresses E). Réponds UNIQUEMENT par le code HTML complet, sans explication, sans balise markdown.";
+  const r=await fetch(E.chat,{method:"POST",headers:{"Content-Type":"application/json"},
+   body:JSON.stringify({messages:[{role:"system",content:demande},{role:"user",content:page}],max:4000})});
+  const j=await r.json();
+  let h=(j.reponse||"").trim().replace(/^```html/i,"").replace(/^```/,"").replace(/```$/,"").trim();
+  if(h.indexOf("<html")<0){o.textContent="La réparation a échoué : le cerveau n'a pas rendu une page valide. Rien n'a été publié.";return}
+  $("code").value=h;
+  const p=await (await fetch(E.base+"/publier",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({cle:"zarel-arta-2026",html:h})})).json();
+  o.textContent=p.etat?("ZARELITE s'est réparé : "+p.octets+" octets publiés. Recharge la page."):("Publication refusée : "+(p.erreur||""));
+ }catch(e){o.textContent="Réparation interrompue : "+e.message}
+}
 function chargerCode(){fetch(E.base+"/code").then(r=>r.json()).then(j=>{$("code").value=j.code||"";
  $("rcode").classList.add("on");$("rcode").textContent="code chargé ("+(j.code||"").length+" octets)"}).catch(()=>{})}
 function publier(){const h=$("code").value;if(!h)return;$("rcode").classList.add("on");$("rcode").textContent="Publication…";
