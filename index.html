@@ -26,7 +26,8 @@ function save(){localStorage.setItem('zarel_hist',JSON.stringify(hist.slice(-40)
 f.onsubmit=async e=>{e.preventDefault();const t=q.value.trim();if(!t)return;
 q.value='';q.style.height='auto';add('u',t);hist.push({role:'user',content:t});save();
 b.disabled=true;st.textContent='réflexion…';const box=add('a','…');
-try{const r=await fetch(API,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:t})});
+try{const convo=[{role:'system',content:'Tu es ZARELITE, IA de ZYRVION (Arta Lyon, Ouagadougou). Reponds en francais, court, et dis franchement quand tu ne sais pas.'}].concat(hist.slice(-6).map(m=>({role:m.role,content:m.content})));
+const r=await fetch(API,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({prompt:t,messages:convo})});
 const j=await r.json();const rep=(j.reponse||j.error||'pas de réponse').trim();
 box.textContent=rep;hist.push({role:'assistant',content:rep});save();st.textContent='en ligne';}
 catch(err){box.textContent='Cerveau injoignable pour le moment.';st.textContent='hors ligne';}
